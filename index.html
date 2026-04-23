@@ -5,21 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StoryLine Reader</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Playfair+Display:wght@600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@500;700&display=swap');
 
     :root {
-      --bg: #f8f5ef;
-      --panel: #ffffff;
+      --bg: #f7f4ee;
+      --panel: rgba(255, 255, 255, 0.74);
+      --panel-strong: #ffffff;
       --panel-soft: #fbfaf7;
-      --ink: #222222;
-      --muted: #6a6254;
-      --accent: #b55223;
+      --ink: #1f1e1a;
+      --muted: #655f52;
+      --accent: #c14c19;
+      --accent-2: #0a7b71;
       --accent-soft: #ffd6bf;
       --ok: #1f7a4a;
-      --ring: rgba(181, 82, 35, 0.25);
-      --border: #e8dfd2;
-      --shadow: 0 20px 50px rgba(34, 34, 34, 0.08);
-      --radius: 18px;
+      --ring: rgba(193, 76, 25, 0.25);
+      --border: #e7dbcc;
+      --shadow: 0 24px 60px rgba(42, 34, 20, 0.1);
+      --radius: 20px;
       --radius-sm: 12px;
     }
 
@@ -38,23 +40,50 @@
       font-family: "Manrope", sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at 10% 10%, #fff4ea 0%, transparent 33%),
-        radial-gradient(circle at 90% 20%, #f2f9ef 0%, transparent 28%),
-        linear-gradient(150deg, #fdfaf4 0%, #f8f4ec 50%, #f7f6f2 100%);
+        radial-gradient(circle at 12% 12%, #ffe8d8 0%, transparent 35%),
+        radial-gradient(circle at 88% 14%, #dff5eb 0%, transparent 30%),
+        linear-gradient(140deg, #fdfaf3 0%, #f6f0e7 55%, #f7f6f2 100%);
       line-height: 1.5;
       overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      filter: blur(30px);
+      opacity: 0.45;
+      animation: drift 11s ease-in-out infinite alternate;
+    }
+
+    body::before {
+      left: -80px;
+      top: 30%;
+      background: #ffd9c2;
+    }
+
+    body::after {
+      right: -60px;
+      top: 12%;
+      background: #c9efe8;
     }
 
     .shell {
       width: min(1200px, 92vw);
       margin: 0 auto;
+      padding-bottom: 30px;
     }
 
     .landing {
-      padding: 72px 0 36px;
+      padding: 72px 0 28px;
       display: grid;
       grid-template-columns: 1.2fr 1fr;
-      gap: 28px;
+      gap: 30px;
       align-items: center;
       animation: rise 700ms ease both;
     }
@@ -65,6 +94,7 @@
       line-height: 1.1;
       letter-spacing: -0.01em;
       margin-bottom: 14px;
+      text-wrap: balance;
     }
 
     .landing p {
@@ -75,14 +105,16 @@
 
     .badge {
       display: inline-block;
-      padding: 8px 12px;
+      padding: 8px 14px;
       border-radius: 999px;
       font-size: 0.82rem;
-      background: var(--accent-soft);
+      background: linear-gradient(120deg, #ffe0cb, #ffeeda);
       color: #8a3f1c;
       font-weight: 700;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       margin-bottom: 14px;
+      border: 1px solid #f3c6aa;
     }
 
     .cta {
@@ -91,14 +123,14 @@
       gap: 8px;
       border: none;
       border-radius: 999px;
-      background: var(--accent);
+      background: linear-gradient(90deg, var(--accent) 0%, #db6d2f 100%);
       color: white;
       font-size: 1rem;
       font-weight: 700;
       padding: 14px 22px;
       cursor: pointer;
       transition: transform 180ms ease, box-shadow 180ms ease;
-      box-shadow: 0 10px 25px rgba(181, 82, 35, 0.28);
+      box-shadow: 0 12px 28px rgba(181, 82, 35, 0.28);
     }
 
     .cta:hover {
@@ -107,13 +139,14 @@
     }
 
     .hero-card {
-      background: linear-gradient(150deg, #fff 0%, #fff8f3 100%);
-      border: 1px solid var(--border);
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.9) 0%, #fff8f3 100%);
+      border: 1px solid #e9d8c7;
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 22px;
+      padding: 24px;
       position: relative;
       overflow: hidden;
+      backdrop-filter: blur(8px);
     }
 
     .hero-card::before {
@@ -130,6 +163,7 @@
     .hero-card h2 {
       font-size: 1.15rem;
       margin-bottom: 10px;
+      font-family: "Space Grotesk", sans-serif;
     }
 
     .hero-card ul {
@@ -146,21 +180,39 @@
     }
 
     .hero-card li::before {
-      content: "•";
+      content: "◆";
       color: var(--accent);
-      font-weight: 800;
+      font-weight: 700;
       margin-top: -1px;
     }
 
+    .hero-stats {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(60px, 1fr));
+      gap: 8px;
+    }
+
+    .hero-stats span {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid #f0e1d3;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #6a4f39;
+      padding: 8px;
+    }
+
     .reader-section {
-      padding: 18px 0 70px;
+      padding: 18px 0 78px;
       animation: rise 900ms ease both;
     }
 
     .grid {
       display: grid;
       grid-template-columns: minmax(300px, 1fr) minmax(350px, 1.2fr);
-      gap: 20px;
+      gap: 22px;
       align-items: stretch;
     }
 
@@ -169,12 +221,15 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 20px;
+      padding: 22px;
+      backdrop-filter: blur(10px);
     }
 
     .panel h3 {
       margin-bottom: 10px;
-      font-size: 1.12rem;
+      font-size: 1.2rem;
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: -0.01em;
     }
 
     .panel p {
@@ -185,7 +240,7 @@
 
     .upload-zone {
       border: 2px dashed #dccbb8;
-      background: var(--panel-soft);
+      background: linear-gradient(180deg, #fffaf5 0%, #fdf9f4 100%);
       border-radius: var(--radius-sm);
       padding: 18px;
     }
@@ -193,10 +248,22 @@
     .upload-zone input {
       width: 100%;
       padding: 12px;
-      border: 1px solid var(--border);
+      border: 1px solid #deccbb;
       border-radius: 10px;
       background: white;
       font-size: 0.95rem;
+    }
+
+    .upload-zone input::file-selector-button {
+      background: #1f1e1a;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-right: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: "Manrope", sans-serif;
     }
 
     .controls {
@@ -220,6 +287,7 @@
       padding: 10px 14px;
       cursor: pointer;
       transition: all 180ms ease;
+      font-family: "Space Grotesk", sans-serif;
     }
 
     button.ctrl:hover {
@@ -228,7 +296,7 @@
     }
 
     button.ctrl.main {
-      background: var(--accent);
+      background: linear-gradient(90deg, var(--accent) 0%, #dc6c2e 100%);
       color: white;
       border-color: transparent;
     }
@@ -239,6 +307,10 @@
       gap: 10px;
       font-size: 0.93rem;
       color: var(--muted);
+      border: 1px solid #eadfce;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #fffdfa;
     }
 
     .speed input {
@@ -261,7 +333,8 @@
     }
 
     .meta h4 {
-      font-size: 1rem;
+      font-size: 1.05rem;
+      font-family: "Space Grotesk", sans-serif;
     }
 
     .meta sub {
@@ -273,7 +346,7 @@
 
     .progress-wrap {
       width: 100%;
-      height: 10px;
+      height: 12px;
       border-radius: 999px;
       overflow: hidden;
       background: #efe8df;
@@ -284,14 +357,22 @@
       width: 0%;
       height: 100%;
       border-radius: inherit;
-      background: linear-gradient(90deg, #dd7b4f 0%, #b55223 100%);
+      background: linear-gradient(90deg, #de7f50 0%, #bf4f1f 70%, #0a7b71 100%);
       transition: width 250ms ease;
     }
 
     .line-box {
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      background: #fffefb;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(252, 248, 240, 0.96)),
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 34px,
+          rgba(208, 189, 166, 0.18) 34px,
+          rgba(208, 189, 166, 0.18) 35px
+        );
       padding: 18px;
       min-height: 220px;
       display: flex;
@@ -305,15 +386,16 @@
       font-size: clamp(1rem, 2vw, 1.22rem);
       line-height: 1.7;
       color: #1e1e1e;
-      font-weight: 600;
+      font-weight: 700;
       border-left: 4px solid var(--accent);
-      padding-left: 10px;
-      animation: pulse 500ms ease;
+      padding: 6px 0 6px 12px;
+      border-radius: 4px;
+      animation: pulse 520ms ease;
     }
 
     .line-next {
       color: #7a7265;
-      font-size: 0.96rem;
+      font-size: 0.93rem;
       opacity: 0.86;
       padding-left: 14px;
     }
@@ -323,6 +405,10 @@
       font-size: 0.9rem;
       color: var(--ok);
       min-height: 24px;
+      border: 1px dashed #cde4d6;
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #f7fcf9;
     }
 
     .empty {
@@ -356,10 +442,19 @@
 
     @keyframes pulse {
       0% {
-        background: rgba(255, 214, 191, 0.8);
+        background: rgba(255, 214, 191, 0.65);
       }
       100% {
         background: transparent;
+      }
+    }
+
+    @keyframes drift {
+      from {
+        transform: translateY(-8px) scale(1);
+      }
+      to {
+        transform: translateY(18px) scale(1.08);
       }
     }
 
@@ -389,6 +484,10 @@
       button.ctrl {
         width: 100%;
       }
+
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -411,6 +510,11 @@
           <li>Read manually or auto-play through every line</li>
           <li>Live line number tracking with progress indicator</li>
         </ul>
+        <div class="hero-stats" aria-hidden="true">
+          <span>Live Track</span>
+          <span>Auto Flow</span>
+          <span>Line Focus</span>
+        </div>
       </aside>
     </section>
 
