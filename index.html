@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoryLine Reader</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Playfair+Display:wght@600;700&display=swap');
+
+    :root {
+      --bg: #f8f5ef;
+      --panel: #ffffff;
+      --panel-soft: #fbfaf7;
+      --ink: #222222;
+      --muted: #6a6254;
+      --accent: #b55223;
+      --accent-soft: #ffd6bf;
+      --ok: #1f7a4a;
+      --ring: rgba(181, 82, 35, 0.25);
+      --border: #e8dfd2;
+      --shadow: 0 20px 50px rgba(34, 34, 34, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, #fff4ea 0%, transparent 33%),
+        radial-gradient(circle at 90% 20%, #f2f9ef 0%, transparent 28%),
+        linear-gradient(150deg, #fdfaf4 0%, #f8f4ec 50%, #f7f6f2 100%);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    .shell {
+      width: min(1200px, 92vw);
+      margin: 0 auto;
+    }
+
+    .landing {
+      padding: 72px 0 36px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 28px;
+      align-items: center;
+      animation: rise 700ms ease both;
+    }
+
+    .landing h1 {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 14px;
+    }
+
+    .landing p {
+      color: var(--muted);
+      max-width: 60ch;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      background: var(--accent-soft);
+      color: #8a3f1c;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 14px;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      border-radius: 999px;
+      background: var(--accent);
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 22px;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      box-shadow: 0 10px 25px rgba(181, 82, 35, 0.28);
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(181, 82, 35, 0.32);
+    }
+
+    .hero-card {
+      background: linear-gradient(150deg, #fff 0%, #fff8f3 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 214, 191, 0.8), rgba(255, 214, 191, 0));
+    }
+
+    .hero-card h2 {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+    }
+
+    .hero-card ul {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .hero-card li {
+      display: flex;
+      gap: 10px;
+      color: var(--muted);
+      align-items: flex-start;
+    }
+
+    .hero-card li::before {
+      content: "•";
+      color: var(--accent);
+      font-weight: 800;
+      margin-top: -1px;
+    }
+
+    .reader-section {
+      padding: 18px 0 70px;
+      animation: rise 900ms ease both;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 1fr) minmax(350px, 1.2fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .panel h3 {
+      margin-bottom: 10px;
+      font-size: 1.12rem;
+    }
+
+    .panel p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+    }
+
+    .upload-zone {
+      border: 2px dashed #dccbb8;
+      background: var(--panel-soft);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+    }
+
+    .upload-zone input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: white;
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button.ctrl {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: white;
+      color: var(--ink);
+      font-weight: 700;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+
+    button.ctrl:hover {
+      border-color: #c4b39e;
+      transform: translateY(-1px);
+    }
+
+    button.ctrl.main {
+      background: var(--accent);
+      color: white;
+      border-color: transparent;
+    }
+
+    .speed {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.93rem;
+      color: var(--muted);
+    }
+
+    .speed input {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .reader {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 14px;
+      min-height: 100%;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .meta h4 {
+      font-size: 1rem;
+    }
+
+    .meta sub {
+      font-size: 0.86rem;
+      color: var(--muted);
+      vertical-align: baseline;
+      margin-left: 4px;
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #efe8df;
+      border: 1px solid #e6ddd2;
+    }
+
+    .progress {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #dd7b4f 0%, #b55223 100%);
+      transition: width 250ms ease;
+    }
+
+    .line-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fffefb;
+      padding: 18px;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      max-height: 430px;
+    }
+
+    .line-current {
+      font-size: clamp(1rem, 2vw, 1.22rem);
+      line-height: 1.7;
+      color: #1e1e1e;
+      font-weight: 600;
+      border-left: 4px solid var(--accent);
+      padding-left: 10px;
+      animation: pulse 500ms ease;
+    }
+
+    .line-next {
+      color: #7a7265;
+      font-size: 0.96rem;
+      opacity: 0.86;
+      padding-left: 14px;
+    }
+
+    .status {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: var(--ok);
+      min-height: 24px;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 1rem;
+      text-align: center;
+      margin: auto 0;
+    }
+
+    .footer-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .focus {
+      outline: none;
+      box-shadow: 0 0 0 4px var(--ring);
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        background: rgba(255, 214, 191, 0.8);
+      }
+      100% {
+        background: transparent;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .landing {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: 94vw;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      .btn-row {
+        flex-direction: column;
+      }
+
+      button.ctrl {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="landing">
+      <div>
+        <span class="badge">Modern Story Reader</span>
+        <h1>Upload Your Story and Read It Line by Line</h1>
+        <p>
+          A simple and polished reading website that follows your text from the first line to the ending line.
+          On one side you upload your book, and on the other side you can see exactly which line is currently being read.
+        </p>
+        <button class="cta" id="startBtn" type="button">Start Reading Experience</button>
+      </div>
+      <aside class="hero-card" aria-label="Highlights">
+        <h2>What this page gives you</h2>
+        <ul>
+          <li>Upload any plain text file and load it instantly</li>
+          <li>Read manually or auto-play through every line</li>
+          <li>Live line number tracking with progress indicator</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="reader-section" id="readerSection">
+      <div class="grid">
+        <section class="panel" aria-labelledby="uploadTitle">
+          <h3 id="uploadTitle">Upload and Controls</h3>
+          <p>Select a .txt file and control how the story is read.</p>
+
+          <div class="upload-zone">
+            <input id="fileInput" type="file" accept=".txt,text/plain" />
+            <div class="footer-note">Tip: Best with UTF-8 plain text books.</div>
+          </div>
+
+          <div class="controls">
+            <div class="btn-row">
+              <button class="ctrl main" id="playPauseBtn" type="button" disabled>Play</button>
+              <button class="ctrl" id="nextBtn" type="button" disabled>Next Line</button>
+              <button class="ctrl" id="prevBtn" type="button" disabled>Previous Line</button>
+              <button class="ctrl" id="restartBtn" type="button" disabled>Restart</button>
+            </div>
+
+            <label class="speed" for="speedRange">
+              Reading Speed
+              <input id="speedRange" type="range" min="400" max="2500" step="100" value="1200" />
+              <span id="speedValue">1200ms</span>
+            </label>
+          </div>
+          <div class="status" id="statusMsg" aria-live="polite">Upload a file to begin.</div>
+        </section>
+
+        <section class="panel reader" aria-labelledby="readerTitle">
+          <div class="meta">
+            <h4 id="readerTitle">Now Reading <sub id="lineMeta">Line 0 / 0</sub></h4>
+            <strong id="percentMeta">0%</strong>
+          </div>
+
+          <div class="progress-wrap" aria-hidden="true">
+            <div class="progress" id="progressBar"></div>
+          </div>
+
+          <div class="line-box" id="lineBox">
+            <p class="empty" id="emptyState">Your current line will appear here after upload.</p>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const readerSection = document.getElementById("readerSection");
+
+    const fileInput = document.getElementById("fileInput");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const speedRange = document.getElementById("speedRange");
+    const speedValue = document.getElementById("speedValue");
+
+    const lineMeta = document.getElementById("lineMeta");
+    const percentMeta = document.getElementById("percentMeta");
+    const progressBar = document.getElementById("progressBar");
+    const lineBox = document.getElementById("lineBox");
+    const statusMsg = document.getElementById("statusMsg");
+
+    let lines = [];
+    let currentIndex = 0;
+    let playing = false;
+    let timer = null;
+
+    startBtn.addEventListener("click", () => {
+      readerSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      fileInput.classList.add("focus");
+      setTimeout(() => fileInput.classList.remove("focus"), 600);
+    });
+
+    speedRange.addEventListener("input", () => {
+      speedValue.textContent = speedRange.value + "ms";
+      if (playing) {
+        stopAutoPlay();
+        startAutoPlay();
+      }
+    });
+
+    fileInput.addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) {
+        return;
+      }
+
+      try {
+        const text = await file.text();
+        const prepared = text
+          .replace(/\r\n/g, "\n")
+          .split("\n")
+          .map(line => line.trimEnd());
+
+        lines = prepared.length ? prepared : [""];
+        currentIndex = 0;
+        playing = false;
+        clearTimer();
+
+        enableControls();
+        updateReader();
+
+        statusMsg.textContent = `Loaded: ${file.name} (${lines.length} lines)`;
+      } catch (error) {
+        statusMsg.textContent = "Could not read this file. Please try another text file.";
+      }
+    });
+
+    playPauseBtn.addEventListener("click", () => {
+      if (!lines.length) return;
+
+      if (playing) {
+        stopAutoPlay();
+      } else {
+        startAutoPlay();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (!lines.length) return;
+      stopAutoPlay();
+      currentIndex = Math.min(currentIndex + 1, lines.length - 1);
+      updateReader();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (!lines.length) return;
+      stopAutoPlay();
+      currentIndex = Math.max(currentIndex - 1, 0);
+      updateReader();
+    });
+
+    restartBtn.addEventListener("click", () => {
+      if (!lines.length) return;
+      stopAutoPlay();
+      currentIndex = 0;
+      updateReader();
+    });
+
+    function enableControls() {
+      playPauseBtn.disabled = false;
+      nextBtn.disabled = false;
+      prevBtn.disabled = false;
+      restartBtn.disabled = false;
+      playPauseBtn.textContent = "Play";
+    }
+
+    function startAutoPlay() {
+      playing = true;
+      playPauseBtn.textContent = "Pause";
+      statusMsg.textContent = "Auto reading in progress...";
+      scheduleTick();
+    }
+
+    function stopAutoPlay() {
+      playing = false;
+      playPauseBtn.textContent = "Play";
+      statusMsg.textContent = "Auto reading paused.";
+      clearTimer();
+    }
+
+    function clearTimer() {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    }
+
+    function scheduleTick() {
+      clearTimer();
+
+      timer = setTimeout(() => {
+        if (!playing) return;
+
+        if (currentIndex >= lines.length - 1) {
+          stopAutoPlay();
+          statusMsg.textContent = "Reached the end of the story.";
+          return;
+        }
+
+        currentIndex += 1;
+        updateReader();
+        scheduleTick();
+      }, Number(speedRange.value));
+    }
+
+    function updateReader() {
+      if (!lines.length) {
+        lineBox.innerHTML = '<p class="empty">Your current line will appear here after upload.</p>';
+        lineMeta.textContent = "Line 0 / 0";
+        percentMeta.textContent = "0%";
+        progressBar.style.width = "0%";
+        return;
+      }
+
+      const currentLine = lines[currentIndex] || "(blank line)";
+      const nextLine = lines[currentIndex + 1];
+      const percent = Math.round(((currentIndex + 1) / lines.length) * 100);
+
+      lineBox.innerHTML = `
+        <p class="line-current">${escapeHtml(currentLine)}</p>
+        <p class="line-next">${nextLine ? "Next: " + escapeHtml(nextLine) : "No more lines. End of story."}</p>
+      `;
+
+      lineMeta.textContent = `Line ${currentIndex + 1} / ${lines.length}`;
+      percentMeta.textContent = percent + "%";
+      progressBar.style.width = percent + "%";
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+  </script>
+</body>
+</html>
