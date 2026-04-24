@@ -340,12 +340,56 @@
       animation: fadeInUp 0.4s ease;
     }
 
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .toast {
+      background: var(--bg-surface);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 16px 24px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: slideInRight 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Loading Spinner */
+    .loader {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .line-next {
-      font-size: 1.125rem;
+      font-size: 1.25rem;
       color: var(--text-muted);
       border-top: 1px solid var(--glass-border);
       padding-top: 24px;
       opacity: 0.6;
+      font-style: italic;
     }
 
     @keyframes fadeInUp {
@@ -441,7 +485,7 @@
     }
 
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
+      appearance: none;
       width: 16px;
       height: 16px;
       background: var(--accent-primary);
@@ -576,9 +620,7 @@
         <div class="empty-state-icon">📂</div>
         <h3>Your Library is Empty</h3>
         <p>Upload your favorite stories, scripts, or notes to start reading them line by line.</p>
-      </div>
-    </main>
-  </div>
+  <div class="toast-container" id="toastContainer"></div>
 
   <script>
     // State Management
@@ -672,39 +714,67 @@
     }
 
     async function processFiles(files) {
+      const formData = new FormData();
       for (const file of files) {
-        try {
-          const text = await readFileAsText(file);
-          const lines = text.replace(/\r\n/g, '\n').split('\n').map(l => l.trimEnd());
-          const cleanedLines = lines.length > 0 ? lines : ["(Empty file)"];
-          
-          const newFile = {
-            id: Date.now() + Math.random(),
-            name: file.name,
-            lines: cleanedLines,
-            currentIndex: 0,
-            playing: false
-          };
-
-          library.push(newFile);
-        } catch (err) {
-          console.error("Error reading file:", file.name, err);
-        }
+        formData.append('files', file);
       }
-      
-      updateLibraryUI();
-      if (activeFileIndex === -1 && library.length > 0) {
-        selectFile(0);
+
+      try {
+        const toast = showToast("Parsing files...", true);
+        
+        const response = await fetch('http://localhost:3000/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('Upload failed');
+        
+        const newFiles = await response.json();
+        library.push(...newFiles);
+        
+        removeToast(toast);
+        showToast(`Successfully added ${newFiles.length} file(s)`);
+        
+        updateLibraryUI();
+        if (activeFileIndex === -1 && library.length > 0) {
+          selectFile(library.length - newFiles.length);
+        }
+      } catch (err) {
+        console.error("Error processing files:", err);
+        showToast("Error connecting to server", false, true);
+        lineCurrent.textContent = "Error: Could not connect to the parsing server. Make sure it is running.";
       }
     }
 
-    function readFileAsText(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = (e) => reject(e);
-        reader.readAsText(file);
-      });
+    function showToast(message, isLoading = false, isError = false) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      if (isError) toast.style.borderColor = 'rgba(255, 100, 100, 0.3)';
+      
+      toast.innerHTML = `
+        ${isLoading ? '<div class="loader"></div>' : '✅'}
+        <span>${message}</span>
+      `;
+      
+      container.appendChild(toast);
+      
+      if (!isLoading) {
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(100%)';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+      return toast;
+    }
+
+    function removeToast(toast) {
+      if (toast) {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+      }
     }
 
     // UI Updates
