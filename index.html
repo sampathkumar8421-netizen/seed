@@ -3,26 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StoryLine Reader</title>
+  <title>StoryLine Pro | Premium Story Reader</title>
+  <meta name="description" content="A premium, line-by-line story reader with multiple file support and cinematic UI.">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&family=Space+Grotesk:wght@500;700&display=swap');
 
     :root {
-      --bg: #f7f4ee;
-      --panel: rgba(255, 255, 255, 0.74);
-      --panel-strong: #ffffff;
-      --panel-soft: #fbfaf7;
-      --ink: #1f1e1a;
-      --muted: #655f52;
-      --accent: #c14c19;
-      --accent-2: #0a7b71;
-      --accent-soft: #ffd6bf;
-      --ok: #1f7a4a;
-      --ring: rgba(193, 76, 25, 0.25);
-      --border: #e7dbcc;
-      --shadow: 0 24px 60px rgba(42, 34, 20, 0.1);
-      --radius: 20px;
+      --bg-dark: #0a0a0c;
+      --bg-surface: #121217;
+      --bg-panel: rgba(25, 25, 35, 0.7);
+      --glass: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text-main: #e2e2e8;
+      --text-muted: #8e8e9c;
+      --accent-primary: #ff6b2b; /* Electric Orange */
+      --accent-secondary: #2ecc71; /* Emerald Teal */
+      --accent-gradient: linear-gradient(135deg, #ff6b2b 0%, #ff9248 100%);
+      --glow: 0 0 20px rgba(255, 107, 43, 0.3);
+      --radius-lg: 24px;
+      --radius-md: 16px;
       --radius-sm: 12px;
+      --font-ui: "Manrope", sans-serif;
+      --font-serif: "Playfair Display", serif;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     * {
@@ -31,712 +34,825 @@
       padding: 0;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
     body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-ui);
       min-height: 100vh;
-      font-family: "Manrope", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 12% 12%, #ffe8d8 0%, transparent 35%),
-        radial-gradient(circle at 88% 14%, #dff5eb 0%, transparent 30%),
-        linear-gradient(140deg, #fdfaf3 0%, #f6f0e7 55%, #f7f6f2 100%);
-      line-height: 1.5;
       overflow-x: hidden;
-      position: relative;
-    }
-
-    body::before,
-    body::after {
-      content: "";
-      position: fixed;
-      z-index: -1;
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      filter: blur(30px);
-      opacity: 0.45;
-      animation: drift 11s ease-in-out infinite alternate;
-    }
-
-    body::before {
-      left: -80px;
-      top: 30%;
-      background: #ffd9c2;
-    }
-
-    body::after {
-      right: -60px;
-      top: 12%;
-      background: #c9efe8;
-    }
-
-    .shell {
-      width: min(1200px, 92vw);
-      margin: 0 auto;
-      padding-bottom: 30px;
-    }
-
-    .landing {
-      padding: 72px 0 28px;
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 30px;
-      align-items: center;
-      animation: rise 700ms ease both;
-    }
-
-    .landing h1 {
-      font-family: "Playfair Display", serif;
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-      margin-bottom: 14px;
-      text-wrap: balance;
-    }
-
-    .landing p {
-      color: var(--muted);
-      max-width: 60ch;
-      margin-bottom: 24px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      background: linear-gradient(120deg, #ffe0cb, #ffeeda);
-      color: #8a3f1c;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-      border: 1px solid #f3c6aa;
-    }
-
-    .cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: none;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent) 0%, #db6d2f 100%);
-      color: white;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 14px 22px;
-      cursor: pointer;
-      transition: transform 180ms ease, box-shadow 180ms ease;
-      box-shadow: 0 12px 28px rgba(181, 82, 35, 0.28);
-    }
-
-    .cta:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 30px rgba(181, 82, 35, 0.32);
-    }
-
-    .hero-card {
-      background: linear-gradient(155deg, rgba(255, 255, 255, 0.9) 0%, #fff8f3 100%);
-      border: 1px solid #e9d8c7;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(8px);
-    }
-
-    .hero-card::before {
-      content: "";
-      position: absolute;
-      right: -40px;
-      top: -40px;
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 214, 191, 0.8), rgba(255, 214, 191, 0));
-    }
-
-    .hero-card h2 {
-      font-size: 1.15rem;
-      margin-bottom: 10px;
-      font-family: "Space Grotesk", sans-serif;
-    }
-
-    .hero-card ul {
-      list-style: none;
-      display: grid;
-      gap: 10px;
-    }
-
-    .hero-card li {
-      display: flex;
-      gap: 10px;
-      color: var(--muted);
-      align-items: flex-start;
-    }
-
-    .hero-card li::before {
-      content: "◆";
-      color: var(--accent);
-      font-weight: 700;
-      margin-top: -1px;
-    }
-
-    .hero-stats {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(60px, 1fr));
-      gap: 8px;
-    }
-
-    .hero-stats span {
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid #f0e1d3;
-      border-radius: 10px;
-      text-align: center;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #6a4f39;
-      padding: 8px;
-    }
-
-    .reader-section {
-      padding: 18px 0 78px;
-      animation: rise 900ms ease both;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(300px, 1fr) minmax(350px, 1.2fr);
-      gap: 22px;
-      align-items: stretch;
-    }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 22px;
-      backdrop-filter: blur(10px);
-    }
-
-    .panel h3 {
-      margin-bottom: 10px;
-      font-size: 1.2rem;
-      font-family: "Space Grotesk", sans-serif;
-      letter-spacing: -0.01em;
-    }
-
-    .panel p {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin-bottom: 14px;
-    }
-
-    .upload-zone {
-      border: 2px dashed #dccbb8;
-      background: linear-gradient(180deg, #fffaf5 0%, #fdf9f4 100%);
-      border-radius: var(--radius-sm);
-      padding: 18px;
-    }
-
-    .upload-zone input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #deccbb;
-      border-radius: 10px;
-      background: white;
-      font-size: 0.95rem;
-    }
-
-    .upload-zone input::file-selector-button {
-      background: #1f1e1a;
-      color: white;
-      border: 0;
-      border-radius: 8px;
-      padding: 8px 10px;
-      margin-right: 10px;
-      cursor: pointer;
-      font-weight: 700;
-      font-family: "Manrope", sans-serif;
-    }
-
-    .controls {
-      margin-top: 14px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    button.ctrl {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: white;
-      color: var(--ink);
-      font-weight: 700;
-      padding: 10px 14px;
-      cursor: pointer;
-      transition: all 180ms ease;
-      font-family: "Space Grotesk", sans-serif;
-    }
-
-    button.ctrl:hover {
-      border-color: #c4b39e;
-      transform: translateY(-1px);
-    }
-
-    button.ctrl.main {
-      background: linear-gradient(90deg, var(--accent) 0%, #dc6c2e 100%);
-      color: white;
-      border-color: transparent;
-    }
-
-    .speed {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.93rem;
-      color: var(--muted);
-      border: 1px solid #eadfce;
-      border-radius: 10px;
-      padding: 10px 12px;
-      background: #fffdfa;
-    }
-
-    .speed input {
-      flex: 1;
-      accent-color: var(--accent);
-    }
-
-    .reader {
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-      gap: 14px;
-      min-height: 100%;
-    }
-
-    .meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 10px;
-    }
-
-    .meta h4 {
-      font-size: 1.05rem;
-      font-family: "Space Grotesk", sans-serif;
-    }
-
-    .meta sub {
-      font-size: 0.86rem;
-      color: var(--muted);
-      vertical-align: baseline;
-      margin-left: 4px;
-    }
-
-    .progress-wrap {
-      width: 100%;
-      height: 12px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: #efe8df;
-      border: 1px solid #e6ddd2;
-    }
-
-    .progress {
-      width: 0%;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #de7f50 0%, #bf4f1f 70%, #0a7b71 100%);
-      transition: width 250ms ease;
-    }
-
-    .line-box {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(252, 248, 240, 0.96)),
-        repeating-linear-gradient(
-          to bottom,
-          transparent 0,
-          transparent 34px,
-          rgba(208, 189, 166, 0.18) 34px,
-          rgba(208, 189, 166, 0.18) 35px
-        );
-      padding: 18px;
-      min-height: 220px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-      max-height: 430px;
     }
 
-    .line-current {
-      font-size: clamp(1rem, 2vw, 1.22rem);
-      line-height: 1.7;
-      color: #1e1e1e;
-      font-weight: 700;
-      border-left: 4px solid var(--accent);
-      padding: 6px 0 6px 12px;
-      border-radius: 4px;
-      animation: pulse 520ms ease;
+    /* Cinematic Background */
+    .bg-blobs {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
     }
 
-    .line-next {
-      color: #7a7265;
-      font-size: 0.93rem;
-      opacity: 0.86;
-      padding-left: 14px;
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.15;
+      animation: drift 20s infinite alternate ease-in-out;
     }
 
-    .status {
-      margin-top: 8px;
-      font-size: 0.9rem;
-      color: var(--ok);
-      min-height: 24px;
-      border: 1px dashed #cde4d6;
-      border-radius: 8px;
-      padding: 8px 10px;
-      background: #f7fcf9;
+    .blob-1 {
+      width: 500px;
+      height: 500px;
+      background: var(--accent-primary);
+      top: -100px;
+      left: -100px;
     }
 
-    .empty {
-      color: var(--muted);
-      font-size: 1rem;
-      text-align: center;
-      margin: auto 0;
-    }
-
-    .footer-note {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-top: 8px;
-    }
-
-    .focus {
-      outline: none;
-      box-shadow: 0 0 0 4px var(--ring);
-    }
-
-    @keyframes rise {
-      from {
-        opacity: 0;
-        transform: translateY(16px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes pulse {
-      0% {
-        background: rgba(255, 214, 191, 0.65);
-      }
-      100% {
-        background: transparent;
-      }
+    .blob-2 {
+      width: 600px;
+      height: 600px;
+      background: var(--accent-secondary);
+      bottom: -150px;
+      right: -100px;
+      animation-delay: -5s;
     }
 
     @keyframes drift {
-      from {
-        transform: translateY(-8px) scale(1);
-      }
-      to {
-        transform: translateY(18px) scale(1.08);
-      }
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(100px, 50px) scale(1.1); }
     }
 
-    @media (max-width: 960px) {
-      .landing {
-        grid-template-columns: 1fr;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
+    /* Layout Structure */
+    .app-container {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      height: 100vh;
+      width: 100%;
+      max-width: 1800px;
+      margin: 0 auto;
+      overflow: hidden;
     }
 
-    @media (max-width: 560px) {
-      .shell {
-        width: 94vw;
-      }
+    /* Sidebar / Library */
+    .sidebar {
+      background: var(--bg-surface);
+      border-right: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      padding: 32px 24px;
+      z-index: 10;
+    }
 
-      .panel {
-        padding: 16px;
-      }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
 
-      .btn-row {
-        flex-direction: column;
-      }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-gradient);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--glow);
+    }
 
-      button.ctrl {
-        width: 100%;
-      }
+    .logo h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: var(--accent-gradient);
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-      .hero-stats {
-        grid-template-columns: 1fr;
-      }
+    .upload-section {
+      margin-bottom: 32px;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: center;
+      background: var(--glass);
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent-primary);
+      background: rgba(255, 107, 43, 0.05);
+    }
+
+    .drop-zone p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    .drop-zone input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .library-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .file-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .file-item {
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .file-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateX(4px);
+    }
+
+    .file-item.active {
+      border-color: var(--accent-primary);
+      background: rgba(255, 107, 43, 0.1);
+      box-shadow: 0 4px 12px rgba(255, 107, 43, 0.1);
+    }
+
+    .file-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .file-name {
+      font-size: 0.93rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+
+    .file-progress-text {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .mini-progress {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .mini-progress-bar {
+      height: 100%;
+      background: var(--accent-primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Main Reader Area */
+    .main-reader {
+      display: flex;
+      flex-direction: column;
+      padding: 40px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .reader-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 40px;
+    }
+
+    .current-file-info h2 {
+      font-family: var(--font-serif);
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+
+    .current-file-info p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .reader-stats {
+      display: flex;
+      gap: 24px;
+    }
+
+    .stat-card {
+      text-align: right;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* Reader Container */
+    .reader-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .focus-box {
+      background: var(--bg-panel);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 60px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .focus-box::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-gradient);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .line-current {
+      font-size: 2rem;
+      line-height: 1.4;
+      font-weight: 700;
+      margin-bottom: 32px;
+      color: #fff;
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .line-next {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--glass-border);
+      padding-top: 24px;
+      opacity: 0.6;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Main Progress Bar */
+    .main-progress-wrap {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: auto;
+    }
+
+    .main-progress-bar {
+      height: 100%;
+      background: var(--accent-gradient);
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 15px rgba(255, 107, 43, 0.4);
+    }
+
+    /* Controls */
+    .controls-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 40px;
+      padding: 24px;
+      background: var(--glass);
+      border-radius: 99px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-icon:hover:not(:disabled) {
+      background: var(--glass-border);
+      border-color: var(--text-main);
+      transform: scale(1.1);
+    }
+
+    .btn-icon:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn-play {
+      width: 64px;
+      height: 64px;
+      background: var(--accent-gradient);
+      border: none;
+      color: white;
+      box-shadow: var(--glow);
+    }
+
+    .btn-play:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(255, 107, 43, 0.5);
+    }
+
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 24px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    input[type="range"] {
+      appearance: none;
+      background: rgba(255, 255, 255, 0.1);
+      height: 4px;
+      border-radius: 2px;
+      width: 120px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 24px;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+    @media (max-width: 1000px) {
+      .app-container { grid-template-columns: 1fr; }
+      .sidebar { display: none; } /* Hide sidebar on mobile for now, can add a toggle later */
+      .main-reader { padding: 24px; }
+      .focus-box { padding: 30px; }
+      .current-file-info h2 { font-size: 1.75rem; }
     }
   </style>
 </head>
 <body>
-  <main class="shell">
-    <section class="landing">
-      <div>
-        <span class="badge">Modern Story Reader</span>
-        <h1>Upload Your Story and Read It Line by Line</h1>
-        <p>
-          A simple and polished reading website that follows your text from the first line to the ending line.
-          On one side you upload your book, and on the other side you can see exactly which line is currently being read.
-        </p>
-        <button class="cta" id="startBtn" type="button">Start Reading Experience</button>
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">📖</div>
+        <h1>StoryLine Pro</h1>
       </div>
-      <aside class="hero-card" aria-label="Highlights">
-        <h2>What this page gives you</h2>
-        <ul>
-          <li>Upload any plain text file and load it instantly</li>
-          <li>Read manually or auto-play through every line</li>
-          <li>Live line number tracking with progress indicator</li>
-        </ul>
-        <div class="hero-stats" aria-hidden="true">
-          <span>Live Track</span>
-          <span>Auto Flow</span>
-          <span>Line Focus</span>
+
+      <div class="upload-section">
+        <div class="drop-zone" id="dropZone">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          <p>Drop files here or click to upload</p>
+          <input type="file" id="fileInput" multiple accept=".txt,.md,.js,.py,.html,.css,.json,text/plain" />
         </div>
-      </aside>
-    </section>
-
-    <section class="reader-section" id="readerSection">
-      <div class="grid">
-        <section class="panel" aria-labelledby="uploadTitle">
-          <h3 id="uploadTitle">Upload and Controls</h3>
-          <p>Select a .txt file and control how the story is read.</p>
-
-          <div class="upload-zone">
-            <input id="fileInput" type="file" accept=".txt,text/plain" />
-            <div class="footer-note">Tip: Best with UTF-8 plain text books.</div>
-          </div>
-
-          <div class="controls">
-            <div class="btn-row">
-              <button class="ctrl main" id="playPauseBtn" type="button" disabled>Play</button>
-              <button class="ctrl" id="nextBtn" type="button" disabled>Next Line</button>
-              <button class="ctrl" id="prevBtn" type="button" disabled>Previous Line</button>
-              <button class="ctrl" id="restartBtn" type="button" disabled>Restart</button>
-            </div>
-
-            <label class="speed" for="speedRange">
-              Reading Speed
-              <input id="speedRange" type="range" min="400" max="2500" step="100" value="1200" />
-              <span id="speedValue">1200ms</span>
-            </label>
-          </div>
-          <div class="status" id="statusMsg" aria-live="polite">Upload a file to begin.</div>
-        </section>
-
-        <section class="panel reader" aria-labelledby="readerTitle">
-          <div class="meta">
-            <h4 id="readerTitle">Now Reading <sub id="lineMeta">Line 0 / 0</sub></h4>
-            <strong id="percentMeta">0%</strong>
-          </div>
-
-          <div class="progress-wrap" aria-hidden="true">
-            <div class="progress" id="progressBar"></div>
-          </div>
-
-          <div class="line-box" id="lineBox">
-            <p class="empty" id="emptyState">Your current line will appear here after upload.</p>
-          </div>
-        </section>
       </div>
-    </section>
-  </main>
+
+      <h3 class="library-title">Library</h3>
+      <div class="file-list" id="fileList">
+        <!-- Files will appear here -->
+      </div>
+    </aside>
+
+    <!-- Main Reader -->
+    <main class="main-reader">
+      <div id="readerUI" style="display: none; height: 100%;">
+        <div class="reader-header">
+          <div class="current-file-info">
+            <h2 id="displayFileName">No File Selected</h2>
+            <p id="displayFileMeta">0 lines total</p>
+          </div>
+          <div class="reader-stats">
+            <div class="stat-card">
+              <div class="stat-value" id="statLine">0</div>
+              <div class="stat-label">Current Line</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statPercent">0%</div>
+              <div class="stat-label">Completion</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reader-container">
+          <div class="focus-box">
+            <p class="line-current" id="lineCurrent">Select a story to begin your reading journey.</p>
+            <p class="line-next" id="lineNext">Next line will appear here.</p>
+          </div>
+
+          <div class="main-progress-wrap">
+            <div class="main-progress-bar" id="mainProgressBar"></div>
+          </div>
+
+          <div class="controls-panel">
+            <button class="btn-icon" id="restartBtn" title="Restart">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            </button>
+            <button class="btn-icon" id="prevBtn" title="Previous Line">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="btn-icon btn-play" id="playPauseBtn" title="Play/Pause">
+              <svg id="playIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <svg id="pauseIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            </button>
+            <button class="btn-icon" id="nextBtn" title="Next Line">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+            
+            <div class="speed-control">
+              <span>Speed</span>
+              <input type="range" id="speedRange" min="500" max="4000" step="100" value="1500" />
+              <span id="speedValue">1.5s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state">
+        <div class="empty-state-icon">📂</div>
+        <h3>Your Library is Empty</h3>
+        <p>Upload your favorite stories, scripts, or notes to start reading them line by line.</p>
+      </div>
+    </main>
+  </div>
 
   <script>
-    const startBtn = document.getElementById("startBtn");
-    const readerSection = document.getElementById("readerSection");
+    // State Management
+    let library = []; // Array of { name, lines, currentIndex, playing, id }
+    let activeFileIndex = -1;
+    let autoPlayTimer = null;
 
-    const fileInput = document.getElementById("fileInput");
-    const playPauseBtn = document.getElementById("playPauseBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const prevBtn = document.getElementById("prevBtn");
-    const restartBtn = document.getElementById("restartBtn");
-    const speedRange = document.getElementById("speedRange");
-    const speedValue = document.getElementById("speedValue");
+    // DOM Elements
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const fileList = document.getElementById('fileList');
+    const readerUI = document.getElementById('readerUI');
+    const emptyState = document.getElementById('emptyState');
 
-    const lineMeta = document.getElementById("lineMeta");
-    const percentMeta = document.getElementById("percentMeta");
-    const progressBar = document.getElementById("progressBar");
-    const lineBox = document.getElementById("lineBox");
-    const statusMsg = document.getElementById("statusMsg");
+    const displayFileName = document.getElementById('displayFileName');
+    const displayFileMeta = document.getElementById('displayFileMeta');
+    const statLine = document.getElementById('statLine');
+    const statPercent = document.getElementById('statPercent');
+    const lineCurrent = document.getElementById('lineCurrent');
+    const lineNext = document.getElementById('lineNext');
+    const mainProgressBar = document.getElementById('mainProgressBar');
 
-    let lines = [];
-    let currentIndex = 0;
-    let playing = false;
-    let timer = null;
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const speedRange = document.getElementById('speedRange');
+    const speedValue = document.getElementById('speedValue');
 
-    startBtn.addEventListener("click", () => {
-      readerSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      fileInput.classList.add("focus");
-      setTimeout(() => fileInput.classList.remove("focus"), 600);
-    });
-
-    speedRange.addEventListener("input", () => {
-      speedValue.textContent = speedRange.value + "ms";
-      if (playing) {
-        stopAutoPlay();
-        startAutoPlay();
-      }
-    });
-
-    fileInput.addEventListener("change", async (event) => {
-      const file = event.target.files?.[0];
-      if (!file) {
-        return;
-      }
-
-      try {
-        const text = await file.text();
-        const prepared = text
-          .replace(/\r\n/g, "\n")
-          .split("\n")
-          .map(line => line.trimEnd());
-
-        lines = prepared.length ? prepared : [""];
-        currentIndex = 0;
-        playing = false;
-        clearTimer();
-
-        enableControls();
-        updateReader();
-
-        statusMsg.textContent = `Loaded: ${file.name} (${lines.length} lines)`;
-      } catch (error) {
-        statusMsg.textContent = "Could not read this file. Please try another text file.";
-      }
-    });
-
-    playPauseBtn.addEventListener("click", () => {
-      if (!lines.length) return;
-
-      if (playing) {
-        stopAutoPlay();
-      } else {
-        startAutoPlay();
-      }
-    });
-
-    nextBtn.addEventListener("click", () => {
-      if (!lines.length) return;
-      stopAutoPlay();
-      currentIndex = Math.min(currentIndex + 1, lines.length - 1);
-      updateReader();
-    });
-
-    prevBtn.addEventListener("click", () => {
-      if (!lines.length) return;
-      stopAutoPlay();
-      currentIndex = Math.max(currentIndex - 1, 0);
-      updateReader();
-    });
-
-    restartBtn.addEventListener("click", () => {
-      if (!lines.length) return;
-      stopAutoPlay();
-      currentIndex = 0;
-      updateReader();
-    });
-
-    function enableControls() {
-      playPauseBtn.disabled = false;
-      nextBtn.disabled = false;
-      prevBtn.disabled = false;
-      restartBtn.disabled = false;
-      playPauseBtn.textContent = "Play";
+    // Initialization
+    function init() {
+      setupEventListeners();
     }
 
-    function startAutoPlay() {
-      playing = true;
-      playPauseBtn.textContent = "Pause";
-      statusMsg.textContent = "Auto reading in progress...";
-      scheduleTick();
-    }
+    function setupEventListeners() {
+      fileInput.addEventListener('change', handleFileUpload);
+      
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+      });
 
-    function stopAutoPlay() {
-      playing = false;
-      playPauseBtn.textContent = "Play";
-      statusMsg.textContent = "Auto reading paused.";
-      clearTimer();
-    }
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+      });
 
-    function clearTimer() {
-      if (timer) {
-        clearTimeout(timer);
-        timer = null;
-      }
-    }
-
-    function scheduleTick() {
-      clearTimer();
-
-      timer = setTimeout(() => {
-        if (!playing) return;
-
-        if (currentIndex >= lines.length - 1) {
-          stopAutoPlay();
-          statusMsg.textContent = "Reached the end of the story.";
-          return;
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          processFiles(files);
         }
+      });
 
-        currentIndex += 1;
-        updateReader();
-        scheduleTick();
-      }, Number(speedRange.value));
+      playPauseBtn.addEventListener('click', togglePlay);
+      nextBtn.addEventListener('click', () => step(1));
+      prevBtn.addEventListener('click', () => step(-1));
+      restartBtn.addEventListener('click', restart);
+      
+      speedRange.addEventListener('input', () => {
+        speedValue.textContent = (speedRange.value / 1000).toFixed(1) + 's';
+        if (activeFileIndex !== -1 && library[activeFileIndex].playing) {
+          stopTimer();
+          startTimer();
+        }
+      });
+
+      // Keyboard shortcuts
+      window.addEventListener('keydown', (e) => {
+        if (activeFileIndex === -1) return;
+        if (e.code === 'Space') {
+          e.preventDefault();
+          togglePlay();
+        } else if (e.code === 'ArrowRight') {
+          step(1);
+        } else if (e.code === 'ArrowLeft') {
+          step(-1);
+        }
+      });
     }
 
-    function updateReader() {
-      if (!lines.length) {
-        lineBox.innerHTML = '<p class="empty">Your current line will appear here after upload.</p>';
-        lineMeta.textContent = "Line 0 / 0";
-        percentMeta.textContent = "0%";
-        progressBar.style.width = "0%";
+    // File Handling
+    async function handleFileUpload(e) {
+      const files = e.target.files;
+      if (files.length > 0) {
+        await processFiles(files);
+      }
+    }
+
+    async function processFiles(files) {
+      for (const file of files) {
+        try {
+          const text = await readFileAsText(file);
+          const lines = text.replace(/\r\n/g, '\n').split('\n').map(l => l.trimEnd());
+          const cleanedLines = lines.length > 0 ? lines : ["(Empty file)"];
+          
+          const newFile = {
+            id: Date.now() + Math.random(),
+            name: file.name,
+            lines: cleanedLines,
+            currentIndex: 0,
+            playing: false
+          };
+
+          library.push(newFile);
+        } catch (err) {
+          console.error("Error reading file:", file.name, err);
+        }
+      }
+      
+      updateLibraryUI();
+      if (activeFileIndex === -1 && library.length > 0) {
+        selectFile(0);
+      }
+    }
+
+    function readFileAsText(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject(e);
+        reader.readAsText(file);
+      });
+    }
+
+    // UI Updates
+    function updateLibraryUI() {
+      if (library.length === 0) {
+        emptyState.style.display = 'flex';
+        readerUI.style.display = 'none';
+        fileList.innerHTML = '';
         return;
       }
 
-      const currentLine = lines[currentIndex] || "(blank line)";
-      const nextLine = lines[currentIndex + 1];
-      const percent = Math.round(((currentIndex + 1) / lines.length) * 100);
+      emptyState.style.display = 'none';
+      readerUI.style.display = 'block';
 
-      lineBox.innerHTML = `
-        <p class="line-current">${escapeHtml(currentLine)}</p>
-        <p class="line-next">${nextLine ? "Next: " + escapeHtml(nextLine) : "No more lines. End of story."}</p>
-      `;
-
-      lineMeta.textContent = `Line ${currentIndex + 1} / ${lines.length}`;
-      percentMeta.textContent = percent + "%";
-      progressBar.style.width = percent + "%";
+      fileList.innerHTML = library.map((file, index) => {
+        const progress = Math.round(((file.currentIndex + 1) / file.lines.length) * 100);
+        return `
+          <div class="file-item ${index === activeFileIndex ? 'active' : ''}" onclick="selectFile(${index})">
+            <div class="file-item-header">
+              <span class="file-name" title="${file.name}">${file.name}</span>
+              <span class="file-progress-text">${progress}%</span>
+            </div>
+            <div class="mini-progress">
+              <div class="mini-progress-bar" style="width: ${progress}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    function escapeHtml(value) {
-      return value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
+    function selectFile(index) {
+      if (activeFileIndex !== -1) {
+        library[activeFileIndex].playing = false;
+        stopTimer();
+      }
+      
+      activeFileIndex = index;
+      const file = library[index];
+      
+      displayFileName.textContent = file.name;
+      displayFileMeta.textContent = `${file.lines.length} lines total`;
+      
+      updateReaderUI();
+      updateLibraryUI();
+      updatePlayButtonUI();
     }
+
+    function updateReaderUI() {
+      const file = library[activeFileIndex];
+      const cur = file.currentIndex;
+      const total = file.lines.length;
+      
+      const currentLineText = file.lines[cur] || "(blank line)";
+      const nextLineText = file.lines[cur + 1] || "End of story.";
+      
+      lineCurrent.textContent = currentLineText;
+      lineNext.textContent = `Next: ${nextLineText}`;
+      
+      statLine.textContent = cur + 1;
+      const percent = Math.round(((cur + 1) / total) * 100);
+      statPercent.textContent = percent + '%';
+      mainProgressBar.style.width = percent + '%';
+
+      // Re-trigger animation
+      lineCurrent.style.animation = 'none';
+      lineCurrent.offsetHeight; // trigger reflow
+      lineCurrent.style.animation = 'fadeInUp 0.4s ease';
+    }
+
+    function updatePlayButtonUI() {
+      const isPlaying = activeFileIndex !== -1 && library[activeFileIndex].playing;
+      playIcon.style.display = isPlaying ? 'none' : 'block';
+      pauseIcon.style.display = isPlaying ? 'block' : 'none';
+    }
+
+    // Controls Logic
+    function togglePlay() {
+      if (activeFileIndex === -1) return;
+      
+      const file = library[activeFileIndex];
+      file.playing = !file.playing;
+      
+      if (file.playing) {
+        if (file.currentIndex >= file.lines.length - 1) {
+          file.currentIndex = 0;
+        }
+        startTimer();
+      } else {
+        stopTimer();
+      }
+      
+      updatePlayButtonUI();
+    }
+
+    function startTimer() {
+      stopTimer();
+      autoPlayTimer = setTimeout(() => {
+        if (activeFileIndex === -1) return;
+        const file = library[activeFileIndex];
+        
+        if (file.currentIndex < file.lines.length - 1) {
+          file.currentIndex++;
+          updateReaderUI();
+          updateLibraryUI();
+          startTimer();
+        } else {
+          file.playing = false;
+          updatePlayButtonUI();
+          stopTimer();
+        }
+      }, speedRange.value);
+    }
+
+    function stopTimer() {
+      if (autoPlayTimer) {
+        clearTimeout(autoPlayTimer);
+        autoPlayTimer = null;
+      }
+    }
+
+    function step(dir) {
+      if (activeFileIndex === -1) return;
+      
+      const file = library[activeFileIndex];
+      file.playing = false;
+      stopTimer();
+      updatePlayButtonUI();
+      
+      const nextIdx = file.currentIndex + dir;
+      if (nextIdx >= 0 && nextIdx < file.lines.length) {
+        file.currentIndex = nextIdx;
+        updateReaderUI();
+        updateLibraryUI();
+      }
+    }
+
+    function restart() {
+      if (activeFileIndex === -1) return;
+      const file = library[activeFileIndex];
+      file.playing = false;
+      file.currentIndex = 0;
+      stopTimer();
+      updatePlayButtonUI();
+      updateReaderUI();
+      updateLibraryUI();
+    }
+
+    init();
   </script>
 </body>
 </html>
